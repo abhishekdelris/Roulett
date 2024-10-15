@@ -1,0 +1,33 @@
+.top-boxes-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .timer-container,
+  .winner-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .timer-text,
+  .winner-text {
+    font-family: 'digital'; /* Use a digital font */
+    font-weight: bold;
+    letter-spacing: 3px;
+    position: absolute;
+    top: 10%; /* Adjust this based on your layout */
+  }
+  
+  .blink {
+    animation: blink-animation 1s steps(5, start) infinite; /* Adjust as needed */
+  }
+  
+  @keyframes blink-animation {
+    to {
+      visibility: hidden;
+    }
+  }
+  

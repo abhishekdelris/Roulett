@@ -1,0 +1,20 @@
+.right-bet-boxes-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Aligns boxes to the left */
+  }
+  
+  .bet-box {
+    background-color: rgba(0, 123, 255, 0.8); /* Assuming 'primary' color */
+    border: 1px solid #d1d1d1; /* Assuming 'borderColorDark' */
+    border-radius: 24px;
+    text-align: center;
+  }
+  
+  .bet-box-text {
+    color: white;
+    font-family: 'CinzelDecorative', serif;
+    font-weight: bold;
+    white-space: pre-line; /* Handles the newline character in text */
+  }
+  

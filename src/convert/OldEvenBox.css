@@ -1,0 +1,23 @@
+.odd-even-boxes-row {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .odd-even-box {
+    background-color: #2c2c2e; /* secondary color */
+    border: 1px solid #d1d1d1; /* borderColorLight */
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .odd-even-text {
+    color: white;
+    font-family: 'digital', sans-serif;
+    letter-spacing: 1.5px;
+  }
+  
+  .color-indicator {
+    border-radius: 16px;
+  }
+  

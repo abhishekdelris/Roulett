@@ -1,0 +1,221 @@
+/* Roulette.css */
+
+.roulette-wheel .wheel {
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .betting-grid .bet-item {
+    transition: transform 0.2s;
+  }
+  
+  .betting-grid .bet-item:hover {
+    transform: scale(1.1);
+  }
+  
+  .btn-exit, .btn-take, .btn-cancel {
+    transition: background-color 0.3s;
+  }
+  
+  .btn-exit:hover {
+    background-color: #4a4a4a;
+  }
+  
+  .btn-take:hover {
+    background-color: #38a169;
+  }
+  
+  .btn-cancel:hover {
+    background-color: #e53e3e;
+  }
+.bettingBg  {
+    background-image: url('src/assets/img/KHEL-bg.jpg');
+}
+
+.rotate {
+  transform: rotate(0deg);
+  transition: transform 4s ease-out;
+}
+
+.bgsvgimg {
+  background: url('./assets/Location-icon.svg');
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+.number-table {
+  border-collapse: collapse;
+}
+
+.number-table tr td {
+  border: 2px solid #f1c15e;
+  text-align: center;
+  padding: 10px;
+}
+
+.bet-item-inner {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: auto;
+  font-size: 22px;
+  border: 2px solid #f1c15e;
+}
+
+.bet-item-inner.text-wrning {
+  color: #f1c15e;
+}
+.number-table tr .border-0 {
+  border: 0 !important;
+}
+.table-bottom td {
+  font-size: 20px;
+}
+
+
+.roulette-wheel {
+  position: relative; /* Make the parent container relative */
+  width: 100%; /* Adjust the width as needed */
+  height: auto; /* Allow height to adjust automatically */
+}
+
+.bg-wheel {
+  width: 100%; /* Set the background wheel to fill the container */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.overlay-wheel {
+  position: absolute; /* Position the wheel absolutely */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Adjust for the size of the image */
+  width: 77%; /* Adjust the size of the overlay image */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.bet-price {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 25px;
+  height: 25px;
+  background: #dc2626;
+  border-radius: 50%;
+  z-index: 9;
+  border: 1px solid #fff;
+}
+.bet-price-center {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  right: -15px;
+  width: 25px;
+  height: 25px;
+  background: #dc2626;
+  border-radius: 50%;
+  z-index: 9;
+  border: 1px solid #fff;
+}
+.bet-price-middle {
+  position: absolute;
+  bottom: -15px;
+  right: 0;
+  left: 0;
+  margin: auto;
+  width: 25px;
+  height: 25px;
+  background: #dc2626;
+  border-radius: 50%;
+  z-index: 9;
+  border: 1px solid #fff;
+}
+.bet-price-main {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 25px;
+  height: 25px;
+  background: #dc2626;
+  border-radius: 50%;
+  z-index: 9;
+  border: 1px solid #fff;
+}
+.bet-price-leftMid {
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    left: -67px;
+    right: 0px;
+    margin: auto;
+    width: 25px;
+    height: 25px;
+    background: #dc2626;
+    border-radius: 50%;
+    z-index: 9;
+    border: 1px solid #fff;
+}
+.bet-price-leftTop {
+  position: absolute;
+  top: -60px;
+  bottom: 0;
+  left: -67px;
+  right: 0px;
+  margin: auto;
+  width: 25px;
+  height: 25px;
+  background: #dc2626;
+  border-radius: 50%;
+  z-index: 9;
+  border: 1px solid #fff;
+}
+.bet-price-leftButtom {
+  position: absolute;
+  top: 60px;
+  bottom: 0;
+  left: -67px;
+  right: 0px;
+  margin: auto;
+  width: 25px;
+  height: 25px;
+  background: #dc2626;
+  border-radius: 50%;
+  z-index: 9;
+  border: 1px solid #fff;
+}
+
+
+.bet-price, .bet-price-center, .bet-price-middle ,.bet-price-main {
+  opacity: 0;
+}
+
+.chip.selected img {
+  box-shadow: 0 0 10px #c9b853;
+}
+
+.betting-table {
+  overflow: hidden;
+}
+
