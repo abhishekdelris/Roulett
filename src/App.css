@@ -1,4 +1,13 @@
-
+@font-face {
+    font-family: 'DigitalFont';
+    src: url('./fonts/digital_fonts/digital-7.ttf') format('truetype'); /* Adjust the path if necessary */
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  .digit-font {
+    font-family: 'DigitalFont', sans-serif;
+  }
 
 body{
     user-select: none;

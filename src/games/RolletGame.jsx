@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect,useRef } from "react";
 import "./Roulette.css"; // Import your custom styles
 import RouletteWheel from "./Roulettewheel";
 import Score from "../assets/img/home/score.png";
@@ -12,10 +12,14 @@ import TwoHundred from "../assets/img/home/200.svg";
 import FiveHundred from "../assets/img/home/500.svg";
 import Thousand from "../assets/img/home/1000.svg";
 import RouletteWheelResult from "./RoulettewheelResult";
+import BackgroundSound from "./BackgroundSound";
+import Sound from '../assets/background_music/the_jazz_trio.ogg';
+
 // import CoinSelect from "./CoinSelect";
 // import { Modal, Button } from "react-bootstrap";
 
 const RouletteGame = () => {
+
   const [selectedCoin, setSelectedCoin] = useState(null); // Coin selection state
 
   // State to hold bet prices for each row
@@ -215,7 +219,7 @@ const RouletteGame = () => {
     center: null,
     middle: null,
   });
-  const [betPricesRow32, setBetPricesRow32] = useState({
+  const [betPricesRow32, setBetPricesRow32] = useState({ 
     main: null,
     secondary: null,
     center: null,
@@ -329,33 +333,37 @@ const handleCoinClick = (coin) => {
   setSelectedCoin(coin);
 };
 
+let existing;
 // Handle bet price click for a specific row and position
 const handleBetPriceClick = (rowSetter, position) => {
   if (selectedCoin !== null) {
-   let count = 0;
-   let existing;
+    let count = 0;
+
+    // Store the existing value for this position
     rowSetter((prev) => {
-      existing = selectedCoin;
+      const currentValue = prev[position] || 0; // Use 0 if no existing value
+      existing = currentValue;
+
       console.log("position", position);
-      if(existing && count) {
-        count++;
-        const totalAmmount = existing + selectedCoin;
+
+      if (existing != null && count <= 1) {
+        count++; // Increment count each time this block is executed
+        const totalAmount = existing + selectedCoin;
         return {
           ...prev,
-          [position] : totalAmmount,
-          }
+          [position]: totalAmount,
+        };
+      } else {
+        return {
+          ...prev,
+          [position]: selectedCoin,
+        };
       }
-     else {
-
-       return {
-       ...prev,
-       [position] : selectedCoin,
-       }
-     }
     });
-
   }
 };
+
+
 
 // Handle bet price click for a specific row and position
 // const handleBetPriceClick = (rowSetter, position) => {
@@ -421,6 +429,7 @@ const handleBetPriceClick = (rowSetter, position) => {
 
   return (
     <div className="game-screen bettingBg text-white h-screen p-6">
+      <BackgroundSound soundFile={Sound} />
       <div className="container mx-auto">
         {/* <CoinSelect/> */}
         {/* <div className="flex flex-wrap">
@@ -515,10 +524,10 @@ const handleBetPriceClick = (rowSetter, position) => {
             {/* Betting Grid */}
             <div className="betting-table relative p-4 rounded-lg">
               {/* Betting Table */}
-              <table className="table-auto w-full text-center number-table">
+              <table className="table-auto w-full text-center number-table digit-font">
                 <tbody>
                   <tr>
-                    <td rowSpan={4} className="relative">
+                    <td rowSpan={4} className="relative digit-font">
                       <div className="bet-item-inner bg-red-600">0</div>
                       <div
                       className="bet-price-main"
@@ -530,8 +539,8 @@ const handleBetPriceClick = (rowSetter, position) => {
                     </td>
                   </tr>
                   <tr>
-                    <td className="relative">
-                      <div className="bet-item-inner bg-red-600">3</div>
+                    <td className="relative digit-font">
+                      <div className="bet-item-inner bg-red-600 digit-font">3</div>
                       {/* Coin on number 3 */}
                       <div
                         className="bet-price-main"
@@ -827,7 +836,7 @@ const handleBetPriceClick = (rowSetter, position) => {
                       </div>
                     </td>
                     <td className="relative">
-                      <div className="bet-item-inner text-warning">72</div>
+                      <div className=" text-warning">2 <br/> To <br/> 1</div>
                       <div
                         className="bet-price-main"
                         style={{ opacity: betPricesRow37.main ? 1 : 0 }}
@@ -1227,7 +1236,7 @@ const handleBetPriceClick = (rowSetter, position) => {
                     </div>
                     </td>
                     <td className="relative">
-                      <div className="bet-item-inner text-warning">72</div>
+                      <div className=" text-warning">2 <br/> To <br/> 1</div>
                       <div
                         className="bet-price-main"
                         style={{ opacity: betPricesRow38.main ? 1 : 0 }}
@@ -1646,7 +1655,7 @@ const handleBetPriceClick = (rowSetter, position) => {
                     </div>
                     </td>
                     <td className="relative">
-                      <div className="bet-item-inner text-warning">72</div>
+                      <div className="text-warning">2 <br/> To <br/> 1</div>
                       <div
                         className="bet-price-main"
                         style={{ opacity: betPricesRow39.main ? 1 : 0 }}
@@ -1659,7 +1668,7 @@ const handleBetPriceClick = (rowSetter, position) => {
                   <tr className="table-bottom">
                     <td className="border-0"></td>
                     <td colSpan={4} className="relative z-40">
-                      <div className="">1 TO 18</div>
+                      <div className="">1 ST 12</div>
                       <div
                         className="bet-price-main z-50"
                         style={{ opacity: betPricesRow40.main ? 1 : 0 }}
@@ -1669,7 +1678,7 @@ const handleBetPriceClick = (rowSetter, position) => {
                       </div>
                     </td>
                     <td colSpan={4} className="relative z-40">
-                      <div className="">19 TO 36</div>
+                      <div className="">2 ND 12</div>
                       <div
                         className="bet-price-main z-50"
                         style={{ opacity: betPricesRow41.main ? 1 : 0 }}
@@ -1679,7 +1688,7 @@ const handleBetPriceClick = (rowSetter, position) => {
                       </div>
                     </td>
                     <td colSpan={4} className="relative overflow-hidden z-40">
-                      <div className="">EVEN/ODD</div>
+                      <div className="">3 RD 12</div>
                       <div
                         className="bet-price-main z-50"
                         style={{ opacity: betPricesRow42.main ? 1 : 0 }}
