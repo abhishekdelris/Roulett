@@ -329,72 +329,65 @@ const RouletteGame = () => {
   });
 
  // Handle coin selection
-const handleCoinClick = (coin) => {
+const handleCoinClick = (coin) => {  
   setSelectedCoin(coin);
 };
 
-let existing;
+const [totalBetAmount, setTotalBetAmount] = useState(0); // State to track total bet amount
+let rowSettervalue;
+let positionvalue;
+
 // Handle bet price click for a specific row and position
 const handleBetPriceClick = (rowSetter, position) => {
+  rowSettervalue = rowSetter;
+  positionvalue = position;
   if (selectedCoin !== null) {
-    let count = 0;
-
-    // Store the existing value for this position
     rowSetter((prev) => {
       const currentValue = prev[position] || 0; // Use 0 if no existing value
-      existing = currentValue;
+      const newBetAmount = currentValue + selectedCoin; // Calculate new bet amount for this position
 
-      console.log("position", position);
+      // Calculate the new total bet amount by summing all positions' bet amounts
+      const updatedRow = {
+        ...prev,
+        [position]: newBetAmount,
+      };
 
-      if (existing != null && count <= 1) {
-        count++; // Increment count each time this block is executed
-        const totalAmount = existing + selectedCoin;
-        return {
-          ...prev,
-          [position]: totalAmount,
-        };
-      } else {
-        return {
-          ...prev,
-          [position]: selectedCoin,
-        };
-      }
+      // Calculate the new total bet amount
+      const total = Object.values(updatedRow).reduce((acc, bet) => acc + bet, 0);
+      
+      setTotalBetAmount(total); // Update the total bet amount
+      
+      console.log("Updated total bet amount:", total);
+
+      return updatedRow;
     });
   }
+  
 };
+console.log("totalBetAmount", totalBetAmount);
 
+// Function to remove selected coin from a specific position
+const handleRemoveBet = (rowSettervalue, positionvalue) => {
 
+  rowSettervalue((prev) => {
+    const currentValue = prev[positionvalue] || 0; // Get the current bet value
+    const updatedRow = {
+      ...prev,
+      [positionvalue]: 0, // Set bet amount to 0 for this position (remove the bet)
+    };
 
-// Handle bet price click for a specific row and position
-// const handleBetPriceClick = (rowSetter, position) => {
-//   if (selectedCoin !== null) {
-//     rowSetter((prev) => {
-//       const existingCoin = prev[position];
+    // Total bet amount ko update karo
+    const total = Object.values(updatedRow).reduce((acc, bet) => acc + bet, 0);
 
-//       // Check if there is already a coin in that position
-//       if (existingCoin && existingCoin.type === selectedCoin) {
-//         // If the same coin type exists, increase its count
-//         return {
-//           ...prev,
-//           [position]: {
-//             type: selectedCoin,
-//             count: existingCoin.count + 1, // Increment the coin count
-//           },
-//         };
-//       } else {
-//         // If there is no coin or a different coin, set it with count 1
-//         return {
-//           ...prev,
-//           [position]: {
-//             type: selectedCoin,
-//             count: 1, // Initialize the count
-//           },
-//         };
-//       }
-//     });
-//   }
-// };
+    setTotalBetAmount(total); // Total amount update karo
+    console.log("Bet removed. Updated total bet amount:", total);
 
+    return updatedRow;
+  });
+
+  // Reset selected coin
+ 
+};
 //this is start logic For is open
 
 
@@ -430,6 +423,7 @@ const handleBetPriceClick = (rowSetter, position) => {
   return (
     <div className="game-screen bettingBg text-white h-screen p-6">
       <BackgroundSound soundFile={Sound} />
+      <button onClick={handleRemoveBet}>Undo</button>
       <div className="container mx-auto">
         {/* <CoinSelect/> */}
         {/* <div className="flex flex-wrap">
