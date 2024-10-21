@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+// Importing the splitNumbers array and findPairsForNumber function from splitNumbers.js
+import { splitNumbers, findPairsForNumber } from '../managerfiles/split';
 
 function CoinSelect({ betPosition, betTitle }) {
   const [coins, setCoins] = useState([]);
   const [selectedCoin, setSelectedCoin] = useState(20);
   const [totalAmount, setTotalAmount] = useState(200);
+
+
+// Use the function with a number to find pairs
+const numberToMatch = 5;
+const pairsForFive = findPairsForNumber(numberToMatch);
+
+console.log(pairsForFive);
 
   const handleCoinClick = async () => {
     try {

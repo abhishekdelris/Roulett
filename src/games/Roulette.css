@@ -219,5 +219,47 @@
   overflow: hidden;
 }
 
+.wheel-model-top {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.position-relative {
+  position: relative;
+}
+.wheel-result-img {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 167px;
+  margin: auto;
+}
+.wheel-spin-img {
+  width: 400px;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+.svg-auro-img {
+  position: absolute;
+  top: 55px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: fit-content;
+}
 
 

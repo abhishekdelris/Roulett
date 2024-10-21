@@ -6,6 +6,8 @@ import RouletteWheel from './games/Roulettewheel';
 import './App.css';
 import CoinSelect from './games/CoinSelect';
 import RouletteGame from './games/RolletGame';
+import RouletteWheelResult from './games/RoulettewheelResult';
+
 
 function App() {
   const betTitle = "single"; // Corrected the variable name to camelCase
@@ -14,7 +16,8 @@ function App() {
   return (
     <div>
       {/* Uncomment as needed */}
-      {/* <RouletteWheel /> */}
+      {/* <RouletteWheelResult /> */}
+      
       <RouletteGame />
       {/* <CoinSelect betTitle={betTitle} betPosition={betPosition} /> */}
       {/* <Login /> */}

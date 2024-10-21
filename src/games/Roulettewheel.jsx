@@ -10,16 +10,20 @@ const RouletteWheel = () => {
 
   const spin = () => {
     if (!isSpinning) {
-      const degrees = Math.floor(Math.random() * 360) + 720; // Random rotation with extra spins
+      // Add random rotation but ensure it ends at 90 degrees
+      const randomSpins = Math.floor(Math.random() * 360) + 720; // Random spins (add 720 for extra spins)
+      const finalAngle = 90; // Ensure it stops at 90 degrees
+      const degrees = randomSpins + (finalAngle - (randomSpins % 360)); // Ensure it ends at 90 degrees
       setRotation(degrees);
       setIsSpinning(true);
-
+  
       // Stop spinning after animation
       setTimeout(() => {
         setIsSpinning(false);
-      }, 8000); // Match with animation duration
+      }, 8000); // Match with animation duration (8 seconds in this case)
     }
   };
+  
 
   return (
     <div className="w-64 flex flex-col items-center justify-center ">
