@@ -2,19 +2,86 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 // Importing the splitNumbers array and findPairsForNumber function from splitNumbers.js
 import { splitNumbers, findPairsForNumber } from '../managerfiles/split';
+import cornorNumber from '../managerfiles/cornor';
+import firstRow from '../managerfiles/FirstRow';
+import secondRow from '../managerfiles/secondRow';
+import thirdRow from '../managerfiles/thirdRow';
 
-function CoinSelect({ betPosition, betTitle }) {
+
+
+function CoinSelect({ betData,betPosition, betTitle }) {
   const [coins, setCoins] = useState([]);
+  const [number, setNumber] = useState([]);
+  const [position, setPosition] = useState([]);
+  const [amount, setAmount] = useState([]);
   const [selectedCoin, setSelectedCoin] = useState(20);
   const [totalAmount, setTotalAmount] = useState(200);
-
+ const winningNumber = 5;
+ const [totalWinningAmount, setTotalWinningAmount] = useState(0);
 
 // Use the function with a number to find pairs
-const numberToMatch = 5;
+
+console.log("pairs....",pairsForFive);
+
+const receivedCoins = async () => {
+  betData.map((res) => {
+    const postion = res.postion;
+    const number = res.number;
+    const amount = res.amount;
+setAmount(amount);
+setNumber(number);
+setPosition(position);
+  })
+}
+
+const handleCheckbet = () => {
+  if(position === 'main' && winningNumber === number) {
+    const win = 36 * amount;
+    setTotalWinningAmount((priviousData) => {
+      priviousData += win;
+    });
+  }
+  if(position === 'center' && winningNumber === number ) {
+    const numberToMatch = number;
 const pairsForFive = findPairsForNumber(numberToMatch);
+if(pairsForFive) {
+  const win = 18 * amount;
+  setTotalWinningAmount((priviousData) => {
+    priviousData += win;
+  });
 
-console.log(pairsForFive);
-
+}
+    
+   }
+  if(position === 'secondary' && winningNumber === number) {
+    const numberToMatch = number;
+const pairsForFive = findPairsForNumber(numberToMatch);
+    const win = 18 * amount;
+    setTotalWinningAmount((priviousData) => {
+      priviousData += win;
+    });
+  }
+  if(position === 'middle' && winningNumber === number) {
+    const numberToMatch = number;
+const pairsForFive = findPairsForNumber(numberToMatch);
+    const win = 9 * amount;
+    setTotalWinningAmount((priviousData) => {
+      priviousData += win;
+    });
+  }
+  if(position === 'top' && winningNumber === number) {
+    const win = 36 * amount;
+    setTotalWinningAmount((priviousData) => {
+      priviousData += win;
+    });
+  }
+  if(position === 'coular' && winningNumber === number) {
+    const win = 36 * amount;
+    setTotalWinningAmount((priviousData) => {
+      priviousData += win;
+    });
+  }
+} 
   const handleCoinClick = async () => {
     try {
       const response = await fetch('https://delristech-projects.in/roulette_web/index.php/api/Web_api/get_bet_type', {
