@@ -341,22 +341,39 @@ const RouletteGame = () => {
     setSelectedCoin(coin);
   };
 
-   // Function to remove selected coin from a specific position
-   const handleRemoveBet = (rowSetter, position) => {
-    rowSetter((prev) => {
+   // Remove bet when isRemove is true
+const handleRemoveBet = (rowSetter, position) => {
+  // Adjust the bet amount for the given position
+  rowSetter((prev) => {
+    const currentValue = prev[position] || 0;
+    
+    if (currentValue > 0) {
+      
+      // Update the row with 0 bet amount for that position
       const updatedRow = {
         ...prev,
-        [position]: selectedCoin, // Set bet amount to 0 for this position (remove the bet)
+        [position]: 0,
       };
 
-      // Update total bet amount
-      const total = Object.values(updatedRow).reduce((acc, bet) => acc + bet, 0);
-      setTotalBetAmount(total); // Total amount update
-      console.log("Bet removed. Updated total bet amount:", total);
-      return updatedRow;
-    });
-  };
+      // Update userBalance by adding back the removed bet amount
+      const newBalance = totalBalance + currentValue;
+      setTotalBalance(newBalance);
 
+      // Remove the selection from userSelect
+      setUserSelect((prevSelections) => 
+        prevSelections.filter((item) => item.position !== position)
+      );
+
+      // Update total bet amount
+      setBet(0); // Reset bet to 0 when all bets are removed or adjusted
+
+      return updatedRow;
+    } else {
+      console.warn("No bet to remove at this position.");
+      return prev;  // If no bet, do nothing
+    }
+  });
+};
 
   const [userSelect, setUserSelect] = useState([]);
   const [numbers, setNumbers] = useState([]);
@@ -367,15 +384,25 @@ const RouletteGame = () => {
     setNumbers(number);
     console.log("number", number);
 
-    if(isRemove === true) {
-      handleRemoveBet(rowSetter,position);
-    }
+    
     
     if (selectedCoin !== null && totalBalance >= bet) {
       rowSetter((prev) => {
         const currentValue = prev[position] || 0; // Use 0 if no existing value
         const newBetAmount = currentValue + selectedCoin; // Calculate new bet amount for this position
   
+        if(isRemove === true) {
+          rowSetter((prev) => {
+          handleRemoveBet(rowSetter,position);
+          
+          const oldBetAmount = newBetAmount - selectedCoin; // Calculate new bet amount for this position
+          const updatedRow = {
+            ...prev,
+            [position]: oldBetAmount,
+          };
+          return updatedRow;
+        })
+        }
         // Calculate the new total bet amount by summing all positions' bet amounts
         const updatedRow = {
           ...prev,
@@ -469,7 +496,7 @@ const RouletteGame = () => {
  
   
   return (
-    <div className="game-screen bettingBg text-white  p-6">
+    <div className="game-screen bettingBg text-white h-full w-full p-6">
       
       <button className="btn btn-success" onClick={handleBetRemovePosition}>Undo</button>
       <div className="container mx-auto">
@@ -481,7 +508,7 @@ const RouletteGame = () => {
               <div className="balance">
                 Your Balance: <span className="font-bold">{totalBalance}</span>
                 {/* Bet Amount: <span className="font-bold">600</span> */}
-              </div>
+              </div> 
               <div className="bet-amount flex">
               <BackgroundSound soundFile={Sound} />
               <div className="bet-amount"><svg width="18" height="18" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
