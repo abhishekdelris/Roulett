@@ -29,6 +29,7 @@ const RouletteGame = () => {
   const [showModal, setShowModal] = useState(false); // Modal visibility state
   const initialTime = 60; // Set your initial time (in seconds)
   const [timeLeft, setTimeLeft] = useState(initialTime); // Timer state
+  const [isActive, setIsActive] = useState(false);
 
   // State to hold bet prices for each row
   const [betPricesRow0, setBetPricesRow0] = useState({
@@ -336,169 +337,213 @@ const RouletteGame = () => {
     middle: null,
   });
 
- // Handle coin selection
-  const handleCoinClick = (coin) => {
-    setSelectedCoin(coin);
-  };
+  const [profileData, setProfileData] = useState(null);
+  const [error, setError] = useState(null);
 
-   // Remove bet when isRemove is true
-const handleRemoveBet = (rowSetter, position) => {
-  // Adjust the bet amount for the given position
-  rowSetter((prev) => {
-    const currentValue = prev[position] || 0;
-    
-    if (currentValue > 0) {
-      
-      // Update the row with 0 bet amount for that position
-      const updatedRow = {
-        ...prev,
-        [position]: 0,
-      };
+  useEffect(() => {
+    const formdata = new FormData();
+    formdata.append("user_id", "1");
 
-      // Update userBalance by adding back the removed bet amount
-      const newBalance = totalBalance + currentValue;
-      setTotalBalance(newBalance);
+    const requestOptions = {
+      method: "POST",
+      body: formdata,
+      redirect: "follow"
+    };
 
-      // Remove the selection from userSelect
-      setUserSelect((prevSelections) => 
-        prevSelections.filter((item) => item.position !== position)
-      );
+    fetch("https://delristech-projects.in/roulette_web/index.php/api/Web_api/get_profile", requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text();
+      })
+      .then((result) => setProfileData(result))
+      .catch((error) => setError(error.message));
+  }, []);
 
-      // Update total bet amount
-      setBet(0); // Reset bet to 0 when all bets are removed or adjusted
+console.log("this is a data for get profile....",profileData);
+// console.log("this is a data for get profile....",profileData.wallet);
 
-      return updatedRow;
-    } else {
-      console.warn("No bet to remove at this position.");
-      return prev;  // If no bet, do nothing
-    }
-  });
+// Handle coin selection
+const handleCoinClick = (coin) => {
+  setSelectedCoin(coin);
 };
 
-  const [userSelect, setUserSelect] = useState([]);
-  const [numbers, setNumbers] = useState([]);
-  const [isRemove, setIsRemove] = useState(false);
-
-  // Handle bet price click for a specific row and position
-  const handleBetPriceClick = async(rowSetter, position, number) => {
-    setNumbers(number);
-    console.log("number", number);
-
-    
-    
-    if (selectedCoin !== null && totalBalance >= bet) {
-      rowSetter((prev) => {
-        const currentValue = prev[position] || 0; // Use 0 if no existing value
-        const newBetAmount = currentValue + selectedCoin; // Calculate new bet amount for this position
+ // Remove bet when isRemove is true
+const handleRemoveBet = (rowSetter, position) => {
+// Adjust the bet amount for the given position
+rowSetter((prev) => {
+  const currentValue = prev[position] || 0;
   
-        if(isRemove === true) {
-          rowSetter((prev) => {
-          handleRemoveBet(rowSetter,position);
-          
-          const oldBetAmount = newBetAmount - selectedCoin; // Calculate new bet amount for this position
-          const updatedRow = {
-            ...prev,
-            [position]: oldBetAmount,
-          };
-          return updatedRow;
-        })
-        }
-        // Calculate the new total bet amount by summing all positions' bet amounts
+  if (currentValue > 0) {
+    
+    // Update the row with 0 bet amount for that position
+    const updatedRow = {
+      ...prev,
+      [position]: 0,
+    };
+
+    // Update userBalance by adding back the removed bet amount
+    const newBalance = totalBalance + currentValue;
+    setTotalBalance(newBalance);
+
+    // Remove the selection from userSelect
+    setUserSelect((prevSelections) => 
+      prevSelections.filter((item) => item.position !== position)
+    );
+
+    // Update total bet amount
+    setBet(0); // Reset bet to 0 when all bets are removed or adjusted
+
+    return updatedRow;
+  } else {
+    console.warn("No bet to remove at this position.");
+    return prev;  // If no bet, do nothing
+  }
+});
+};
+
+const [userSelect, setUserSelect] = useState([]);
+const [numbers, setNumbers] = useState([]);
+const [isRemove, setIsRemove] = useState(false);
+
+// Handle bet price click for a specific row and position
+const handleBetPriceClick = async(rowSetter, position, number) => {
+
+  setIsActive(true);
+  setNumbers(number);
+  console.log("number", number);
+
+  
+  
+  if (selectedCoin !== null && totalBalance >= bet) {
+    rowSetter((prev) => {
+      const currentValue = prev[position] || 0; // Use 0 if no existing value
+      const newBetAmount = currentValue + selectedCoin; // Calculate new bet amount for this position
+
+      if(isRemove === true) {
+        rowSetter((prev) => {
+        handleRemoveBet(rowSetter,position);
+        
+        const oldBetAmount = newBetAmount - selectedCoin; // Calculate new bet amount for this position
         const updatedRow = {
           ...prev,
-          [position]: newBetAmount,
+          [position]: oldBetAmount,
         };
-  
-        setBet(newBetAmount); // Update the total bet amount
-        const userBalance = totalBalance - selectedCoin;
-        setTotalBalance(userBalance);
-  
-        // Update userSelect to ensure unique position-number combinations
-        setUserSelect((prevSelections) => {
-          // Check if the combination of position and number already exists
-          const existingEntry = prevSelections.find(
-            (item) => item.position === position && item.number === number
-          );
-  
-          if (existingEntry) {
-            // If exists, update the existing entry with the new bet amount
-            return prevSelections.map((item) =>
-              item.position === position && item.number === number
-                ? { ...item, amount: newBetAmount }
-                : item
-            );
-          } else {
-            // If no entry exists, add a new one
-            return [
-              ...prevSelections, // Spread the previous array elements
-              {
-                position: position,
-                number: number,
-                amount: newBetAmount,
-              },
-            ];
-          }
-        });
-  
         return updatedRow;
-      });
-    } else {
-      console.warn("Insufficient balance or no coin selected.");
-      alert("Insufficient balance or no coin selected.");
-    }
-  };
-  
-
- 
-  console.log('privious bet.....',previousBet);
-  console.log("total balance.....", totalBalance);
-  console.log("total bet Amount....", totalBetAmount);
-  console.log("select bet...",bet);
-  console.log("use selected bet...",userSelect);
-  console.log("numbewrs.....", numbers);
-  const handleBetRemovePosition = () => {
-    isRemove(true)
-  }
-  const handleCheckWinning = () => {
-    const win = 23;
-  
-    const winningData = userSelect.find((data) => data.number === win);
-  
-    if (winningData) {
-      console.log("you won");
-    }
-  };
-  // Timer effect
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (timeLeft > 0) {
-        setTimeLeft((prevTime) => prevTime - 1);
-      } else {
-        // Reset to initial time or handle end of timer logic
-        setTimeLeft(initialTime);
-        // Optionally show a modal or execute some action here
-        setShowModal(true);
+      })
       }
-    }, 1000);
+      // Calculate the new total bet amount by summing all positions' bet amounts
+      const updatedRow = {
+        ...prev,
+        [position]: newBetAmount,
+      };
 
-    // Cleanup the interval when the component is unmounted
-    return () => clearInterval(timer);
-  }, [timeLeft, initialTime]); // Re-run the effect every time `timeLeft` changes
+      setBet(newBetAmount); // Update the total bet amount
+      const userBalance = totalBalance - selectedCoin;
+      setTotalBalance(userBalance);
 
-  // Function to format the time as MM:SS
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+      // Update userSelect to ensure unique position-number combinations
+      setUserSelect((prevSelections) => {
+        // Check if the combination of position and number already exists
+        const existingEntry = prevSelections.find(
+          (item) => item.position === position && item.number === number
+        );
+
+        if (existingEntry) {
+          // If exists, update the existing entry with the new bet amount
+          return prevSelections.map((item) =>
+            item.position === position && item.number === number
+              ? { ...item, amount: newBetAmount }
+              : item
+          );
+        } else {
+          // If no entry exists, add a new one
+          return [
+            ...prevSelections, // Spread the previous array elements
+            {
+              position: position,
+              number: number,
+              amount: newBetAmount,
+            },
+          ];
+        }
+      });
+
+      return updatedRow;
+    });
+  } else {
+    console.warn("Insufficient balance or no coin selected.");
+    alert("Insufficient balance or no coin selected.");
+  }
+};
+
+
+
+console.log('privious bet.....',previousBet);
+console.log("total balance.....", totalBalance);
+console.log("total bet Amount....", totalBetAmount);
+console.log("select bet...",bet);
+console.log("use selected bet...",userSelect);
+console.log("numbewrs.....", numbers);
+const handleBetRemovePosition = () => {
+  isRemove(true)
+}
+const handleCheckWinning = () => {
+  const win = 23;
+
+  const winningData = userSelect.find((data) => data.number === win);
+const betBalance = postionConvert.data
+  if (winningData) {
+    console.log("you won");
+  }
+};
+
+const handleClickOutside = (event) => {
+  // Check if the click is outside the active area
+  if (!isActive) return;
+  // Logic to handle the click outside (e.g., closing a menu)
+  console.log('Clicked outside the bet price area');
+  setIsActive(false);
+};
+
+useEffect(() => {
+  // Attach event listener for clicks
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
   };
+}, [isActive]); // Dependency on isActive to re-attach listener when it changes
 
- 
+// Timer effect
+useEffect(() => {
+  const timer = setInterval(() => {
+    if (timeLeft > 0) {
+      setTimeLeft((prevTime) => prevTime - 1);
+    } else {
+      // Reset to initial time or handle end of timer logic
+      setTimeLeft(initialTime);
+      // Optionally show a modal or execute some action here
+      setShowModal(true);
+    }
+  }, 1000);
+
+  // Cleanup the interval when the component is unmounted
+  return () => clearInterval(timer);
+}, [timeLeft, initialTime]); // Re-run the effect every time `timeLeft` changes
+
+// Function to format the time as MM:SS
+const formatTime = (time) => {
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+};
  
   
   return (
-    <div className="game-screen bettingBg text-white h-full w-full p-6">
+    <div className="game-screen bettingBg text-white h-screen ">
       
-      <button className="btn btn-success" onClick={handleBetRemovePosition}>Undo</button>
+      {/* <button onClick={handleRemoveBet}>Undo</button> */}
       <div className="container mx-auto">
         {/* <CoinSelect/> */}
         <div className="flex flex-wrap">
@@ -507,16 +552,11 @@ const handleRemoveBet = (rowSetter, position) => {
             <header className="flex justify-between items-center mb-4">
               <div className="balance">
                 Your Balance: <span className="font-bold">{totalBalance}</span>
-                {/* Bet Amount: <span className="font-bold">600</span> */}
-              </div> 
-              <div className="bet-amount flex">
-              <BackgroundSound soundFile={Sound} />
-              <div className="bet-amount"><svg width="18" height="18" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M7.9756 3.5586C7.96042 3.43761 7.88542 3.33268 7.77604 3.27911L7.26529 3.02417C7.1818 2.98086 7.11751 2.90854 7.08493 2.82059C7.0635 2.76478 7.04028 2.70941 7.01573 2.65495C6.97599 2.56923 6.97019 2.47189 6.99876 2.38216L7.17957 1.84014C7.21931 1.72495 7.19832 1.5977 7.12332 1.50127C6.93893 1.27044 6.72955 1.06104 6.49874 0.876657C6.40275 0.802096 6.27552 0.780666 6.16033 0.820401L5.6179 1.00122C5.52816 1.03024 5.43084 1.02443 5.34512 0.9847C5.29065 0.960144 5.23529 0.936927 5.17949 0.915496C5.09154 0.882457 5.01922 0.818165 4.97591 0.735124L4.72054 0.224353H4.72098C4.66741 0.114521 4.5625 0.0395119 4.44151 0.024779C4.14819 -0.00825968 3.85174 -0.00825968 3.55842 0.024779C3.43743 0.0395131 3.33252 0.114521 3.27939 0.224353L3.02402 0.734667C2.98071 0.818157 2.90839 0.882453 2.82045 0.915039C2.76464 0.93647 2.70928 0.959687 2.65481 0.984242C2.5691 1.02398 2.47176 1.02978 2.38203 1.00121L1.84004 0.820391C1.72486 0.780654 1.59762 0.801639 1.50119 0.876647C1.27083 1.06104 1.06099 1.27043 0.876613 1.50126C0.802056 1.59725 0.780626 1.72449 0.82036 1.83968L1.00117 2.38214C1.03019 2.47189 1.02438 2.56921 0.98465 2.65494C0.960096 2.70941 0.93688 2.76477 0.91545 2.82058C0.882413 2.90853 0.818124 2.9813 0.735087 3.02416L0.224342 3.27955C0.114515 3.33268 0.0395099 3.4376 0.0247778 3.55859C-0.00825926 3.85192 -0.00825926 4.14839 0.0247778 4.44172C0.0395111 4.56272 0.114515 4.66764 0.224342 4.72121L0.735087 4.9766V4.97615C0.818126 5.01946 0.88242 5.09178 0.91545 5.17974C0.93688 5.23554 0.960094 5.29091 0.98465 5.34538C1.02438 5.4311 1.03019 5.52843 1.00117 5.61817L0.82036 6.16019C0.780625 6.27538 0.801609 6.40262 0.876613 6.49861C1.061 6.72943 1.27038 6.93928 1.50119 7.12368C1.59718 7.19824 1.72486 7.21967 1.8396 7.17993L2.38203 6.99912H2.38248C2.47222 6.97009 2.56954 6.9759 2.65481 7.01564C2.70928 7.04019 2.76464 7.06341 2.82045 7.08484H2.82089C2.90884 7.11743 2.98116 7.18172 3.02402 7.26521L3.27939 7.77598C3.33252 7.88537 3.43788 7.96082 3.55843 7.97556C3.85219 8.00815 4.14819 8.00815 4.44195 7.97556C4.5625 7.96082 4.66742 7.88537 4.72099 7.77598L4.97636 7.26521C5.01922 7.18172 5.09154 7.11742 5.17949 7.08484C5.23529 7.06341 5.29065 7.04019 5.34512 7.01564H5.34557C5.43084 6.9759 5.52817 6.97009 5.6179 6.99912L6.15989 7.17993C6.27507 7.21967 6.40231 7.19868 6.4983 7.12368C6.72911 6.93928 6.93895 6.72989 7.12333 6.49907C7.19789 6.40308 7.21932 6.27583 7.17958 6.16064L6.99878 5.61818C6.96976 5.52844 6.97556 5.43111 7.0153 5.34539C7.03985 5.29092 7.06307 5.23555 7.08449 5.17975C7.11709 5.09179 7.18138 5.01947 7.26486 4.97616L7.7756 4.72078V4.72122C7.88498 4.66765 7.96043 4.56273 7.97517 4.44173C8.0082 4.1484 8.00819 3.85194 7.9756 3.5586ZM3.99998 5.82889C3.51513 5.82889 3.04993 5.63601 2.70711 5.29312C2.3643 4.95023 2.17137 4.485 2.17137 4.00019C2.17137 3.51538 2.36424 3.0501 2.70711 2.70726C3.04999 2.36443 3.51519 2.17149 3.99998 2.17149C4.48477 2.17149 4.95002 2.36437 5.29284 2.70726C5.63566 3.05015 5.82858 3.51538 5.82858 4.00019C5.82858 4.485 5.63571 4.95028 5.29284 5.29312C4.94997 5.63595 4.48477 5.82889 3.99998 5.82889Z" fill="white"/>
-</svg>
-</div>
               </div>
-            
+              <div className="bet-amount">
+                Bet Amount: <span className="font-bold">600</span>
+              </div>
+                <BackgroundSound soundFile={Sound} />
             </header>
           </div>
           </div>
@@ -543,8 +583,8 @@ const handleRemoveBet = (rowSetter, position) => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          
-            <RouletteWheelResult betData={userSelect}/>
+          <div className=" rounded-lg p-6 w-96">
+            <RouletteWheelResult betData={userSelect} />
             <button
               onClick={() => setShowModal(false)}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
@@ -552,7 +592,7 @@ const handleRemoveBet = (rowSetter, position) => {
               Close
             </button>
           </div>
-        
+        </div>
       )}
     </div>
   
@@ -586,14 +626,14 @@ const handleRemoveBet = (rowSetter, position) => {
               </div>
             </div>
           </div>
-          <div className="w-full md:w-1/2 lg:w-1/4 px-4 mb-4">
+          <div className="w-1/4">
             {/* Roulette Wheel */}
             <div className="roulette-wheel">
               <RouletteWheel />
             </div>
           </div>
 
-          <div className="w-full md:w-1/2 lg:w-3/4  mb-4">
+          <div className="w-3/4 ">
             {/* Betting Grid */}
             <div className="betting-table relative p-4 rounded-lg">
               {/* Betting Table */}
@@ -913,7 +953,7 @@ const handleRemoveBet = (rowSetter, position) => {
                       <div
                         className="bet-price-main"
                         style={{ opacity: betPricesRow37.main ? 1 : 0 }}
-                        onClick={() => handleBetPriceClick(setBetPricesRow37, 'main')}
+                        onClick={() => handleBetPriceClick(setBetPricesRow37, 'main',37)}
                       >
                         {betPricesRow37.main || "Select a coin and click here"}
                       </div>
@@ -1313,7 +1353,7 @@ const handleRemoveBet = (rowSetter, position) => {
                       <div
                         className="bet-price-main"
                         style={{ opacity: betPricesRow38.main ? 1 : 0 }}
-                        onClick={() => handleBetPriceClick(setBetPricesRow38, 'main')}
+                        onClick={() => handleBetPriceClick(setBetPricesRow38, 'main',38)}
                       >
                         {betPricesRow38.main || "Select a coin and click here"}
                       </div>
@@ -1732,7 +1772,7 @@ const handleRemoveBet = (rowSetter, position) => {
                       <div
                         className="bet-price-main"
                         style={{ opacity: betPricesRow39.main ? 1 : 0 }}
-                        onClick={() => handleBetPriceClick(setBetPricesRow39, 'main')}
+                        onClick={() => handleBetPriceClick(setBetPricesRow39, 'main',39)}
                       >
                         {betPricesRow39.main || "Select a coin and click here"}
                       </div>
@@ -1745,7 +1785,7 @@ const handleRemoveBet = (rowSetter, position) => {
                       <div
                         className="bet-price-main z-50"
                         style={{ opacity: betPricesRow40.main ? 1 : 0 }}
-                        onClick={() => handleBetPriceClick(setBetPricesRow40, 'main')}
+                        onClick={() => handleBetPriceClick(setBetPricesRow40, 'main',40)}
                       >
                         {betPricesRow40.main || "Select a coin and click here"}
                       </div>
@@ -1755,7 +1795,7 @@ const handleRemoveBet = (rowSetter, position) => {
                       <div
                         className="bet-price-main z-50"
                         style={{ opacity: betPricesRow41.main ? 1 : 0 }}
-                        onClick={() => handleBetPriceClick(setBetPricesRow41, 'main')}
+                        onClick={() => handleBetPriceClick(setBetPricesRow41, 'main',41)}
                       >
                         {betPricesRow41.main || "Select a coin and click here"}
                       </div>
@@ -1765,7 +1805,7 @@ const handleRemoveBet = (rowSetter, position) => {
                       <div
                         className="bet-price-main z-50"
                         style={{ opacity: betPricesRow42.main ? 1 : 0 }}
-                        onClick={() => handleBetPriceClick(setBetPricesRow42, 'main')}
+                        onClick={() => handleBetPriceClick(setBetPricesRow42, 'main',42)}
                       >
                         {betPricesRow42.main || "Select a coin and click here"}
                       </div>
@@ -1782,7 +1822,7 @@ const handleRemoveBet = (rowSetter, position) => {
                   <div
                     className="bet-price-main z-50"
                     style={{ opacity: betPricesRow43.main ? 1 : 0 }}
-                    onClick={() => handleBetPriceClick(setBetPricesRow43, 'main')}
+                    onClick={() => handleBetPriceClick(setBetPricesRow43, 'main',43)}
                   >
                     {betPricesRow43.main || "Select a coin and click here"}
                   </div>
@@ -1792,7 +1832,7 @@ const handleRemoveBet = (rowSetter, position) => {
                   <div
                     className="bet-price-main z-50"
                     style={{ opacity: betPricesRow44.main ? 1 : 0 }}
-                    onClick={() => handleBetPriceClick(setBetPricesRow44, 'main')}
+                    onClick={() => handleBetPriceClick(setBetPricesRow44, 'main',44)}
                   >
                     {betPricesRow44.main || "Select a coin and click here"}
                   </div>
@@ -1802,7 +1842,7 @@ const handleRemoveBet = (rowSetter, position) => {
                   <div
                     className="bet-price-main z-50"
                     style={{ opacity: betPricesRow45.main ? 1 : 0 }}
-                    onClick={() => handleBetPriceClick(setBetPricesRow45, 'main')}
+                    onClick={() => handleBetPriceClick(setBetPricesRow45, 'main',45)}
                   >
                     {betPricesRow45.main || "Select a coin and click here"}
                   </div>
@@ -1812,7 +1852,7 @@ const handleRemoveBet = (rowSetter, position) => {
                   <div
                     className="bet-price-main z-50"
                     style={{ opacity: betPricesRow46.main ? 1 : 0 }}
-                    onClick={() => handleBetPriceClick(setBetPricesRow46, 'main')}
+                    onClick={() => handleBetPriceClick(setBetPricesRow46, 'main',46)}
                   >
                     {betPricesRow46.main || "Select a coin and click here"}
                   </div>
@@ -1822,7 +1862,7 @@ const handleRemoveBet = (rowSetter, position) => {
                   <div
                     className="bet-price-main z-50"
                     style={{ opacity: betPricesRow47.main ? 1 : 0 }}
-                    onClick={() => handleBetPriceClick(setBetPricesRow47, 'main')}
+                    onClick={() => handleBetPriceClick(setBetPricesRow47, 'main',47)}
                   >
                     {betPricesRow47.main || "Select a coin and click here"}
                   </div>
@@ -1832,7 +1872,7 @@ const handleRemoveBet = (rowSetter, position) => {
                   <div
                     className="bet-price-main z-50"
                     style={{ opacity: betPricesRow48.main ? 1 : 0 }}
-                    onClick={() => handleBetPriceClick(setBetPricesRow48, 'main')}
+                    onClick={() => handleBetPriceClick(setBetPricesRow48, 'main',48)}
                   >
                     {betPricesRow48.main || "Select a coin and click here"}
                   </div>
